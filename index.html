@@ -1,0 +1,476 @@
+<!doctype html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mocha · palabra al revés</title>
+<meta name="description" content="Juego de party: graba una palabra, escúchala al revés, imítala y adivina.">
+<meta name="theme-color" content="#171C2E">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Mocha">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" type="image/png" href="icon-180.png">
+<style>
+  @font-face { font-family: Rubik; font-weight: 500; font-display: swap; src: url(fonts/rubik-500.woff2) format("woff2"); }
+  @font-face { font-family: Rubik; font-weight: 700; font-display: swap; src: url(fonts/rubik-700.woff2) format("woff2"); }
+  @font-face { font-family: Rubik; font-weight: 900; font-display: swap; src: url(fonts/rubik-900.woff2) format("woff2"); }
+
+  :root {
+    --night: #171C2E;
+    --night-raised: #222842;
+    --night-line: #343B5C;
+    --paper: #F6F2EA;
+    --paper-muted: #9AA1BE;
+    --coral: #E8461A;
+    --coral-ink: #FFF6F0;
+    --periwinkle: #5674DA;
+    --periwinkle-ink: #F4F6FF;
+    --lime: #8FDC2C;
+    --lime-ink: #15260A;
+    --radius: 26px;
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; margin: 0; }
+  html, body { height: 100%; background: var(--night); }
+  body {
+    font-family: Rubik, system-ui, sans-serif;
+    font-weight: 500;
+    color: var(--paper);
+    -webkit-tap-highlight-color: transparent;
+    -webkit-user-select: none;
+    user-select: none;
+    touch-action: manipulation;
+    overscroll-behavior: none;
+  }
+  ::selection { background: var(--lime); color: var(--lime-ink); }
+
+  .app {
+    height: 100dvh;
+    max-width: 520px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    padding: calc(env(safe-area-inset-top) + 4px) 16px calc(env(safe-area-inset-bottom) + 8px);
+  }
+
+  header { height: 56px; display: flex; align-items: center; gap: 10px; flex: none; }
+  header h1 { font-weight: 900; font-size: 26px; letter-spacing: -0.01em; }
+  header p { flex: 1; color: var(--paper-muted); font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+  button { font: inherit; color: inherit; border: 0; background: none; cursor: pointer; }
+  button:focus-visible { outline: 3px solid var(--paper); outline-offset: 3px; }
+
+  .pill {
+    height: 48px;
+    display: inline-flex; align-items: center; gap: 8px;
+    border-radius: 999px;
+    background: var(--night-raised);
+    border: 1px solid var(--night-line);
+    transition: transform 160ms cubic-bezier(.2, .9, .3, 1), opacity 200ms;
+  }
+  .pill:active { transform: scale(.95); }
+  .pill:disabled { opacity: .4; cursor: default; transform: none; }
+  .round-btn { width: 48px; justify-content: center; }
+  .pill svg { width: 20px; height: 20px; fill: currentColor; flex: none; }
+  .round-btn svg { width: 24px; height: 24px; }
+
+  .card {
+    flex: 1 1 0;
+    min-height: 0;
+    width: 100%;
+    margin-top: 10px;
+    border-radius: var(--radius);
+    padding: 0 20px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center;
+    container-type: size;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, .25);
+    transition: transform 180ms cubic-bezier(.2, .9, .3, 1), opacity 220ms;
+  }
+  .card:first-of-type { margin-top: 6px; }
+  .card:active { transform: scale(.98); }
+  .card:disabled { opacity: .4; cursor: default; transform: none; }
+  .card .icon { width: 44px; height: 44px; fill: currentColor; flex: none; }
+  .card .label {
+    margin-top: 8px;
+    font-weight: 900; font-size: 21px; letter-spacing: .03em; text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .card .hint { margin-top: 2px; font-size: 14px; opacity: .9; max-width: 34ch; }
+  /* Pantalla chica o letra grande: el ícono cede antes que el texto */
+  @container (max-height: 118px) { .card .icon { display: none; } .card .label { margin-top: 0; } }
+
+  .coral { background: var(--coral); color: var(--coral-ink); }
+  .blue { background: var(--periwinkle); color: var(--periwinkle-ink); }
+  .lime { background: var(--lime); color: var(--lime-ink); }
+
+  .busy .icon { animation: pulse 1040ms ease-in-out infinite; }
+  @keyframes pulse { 50% { opacity: .35; } }
+
+  .turn {
+    flex: none; margin-top: 12px; margin-bottom: 2px;
+    text-align: center; color: var(--paper-muted); font-size: 14px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+
+  .bottom { flex: none; margin-top: 12px; display: flex; align-items: center; gap: 6px; }
+  .bottom .spacer { flex: 1; }
+  .reveal { padding: 0 16px 0 14px; font-weight: 700; font-size: 15px; }
+  .score { padding: 0 5px 0 12px; font-weight: 700; font-size: 15px; gap: 8px; }
+  .score b {
+    min-width: 36px; height: 36px; padding: 0 7px;
+    display: inline-grid; place-items: center;
+    border-radius: 18px;
+    background: var(--paper); color: var(--night);
+    font-weight: 900; font-size: 16px; font-variant-numeric: tabular-nums;
+  }
+  .score b.bump { animation: bump 240ms cubic-bezier(.2, .9, .3, 1); }
+  @keyframes bump { from { transform: scale(1.35); } }
+
+  footer { flex: none; margin-top: 10px; text-align: center; color: var(--paper-muted); font-size: 12px; }
+
+  .toast {
+    position: fixed; left: 50%; bottom: calc(env(safe-area-inset-bottom) + 96px);
+    transform: translate(-50%, 12px);
+    width: max-content; max-width: calc(100% - 32px);
+    padding: 12px 18px; border-radius: 16px;
+    background: var(--paper); color: var(--night);
+    font-size: 15px; text-align: center;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, .35);
+    opacity: 0; pointer-events: none;
+    transition: opacity 200ms, transform 260ms cubic-bezier(.2, .9, .3, 1);
+  }
+  .toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .busy .icon, .score b.bump { animation: none; }
+    .card, .pill, .toast { transition: none; }
+  }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-mic" viewBox="0 0 24 24"><path d="M12,14c1.66,0 2.99,-1.34 2.99,-3L15,5c0,-1.66 -1.34,-3 -3,-3S9,3.34 9,5v6c0,1.66 1.34,3 3,3zM17.3,11c0,3 -2.54,5.1 -5.3,5.1S6.7,14 6.7,11H5c0,3.41 2.72,6.23 6,6.72V21h2v-3.28c3.28,-0.48 6,-3.3 6,-6.72h-1.7z"/></symbol>
+  <symbol id="i-back" viewBox="0 0 24 24"><path d="M17.2,4.6c0.86,-0.55 1.8,0.07 1.8,1.08v12.64c0,1.01 -0.94,1.63 -1.8,1.08L7.3,13.08c-0.79,-0.5 -0.79,-1.66 0,-2.16z"/></symbol>
+  <symbol id="i-stop" viewBox="0 0 24 24"><path d="M7.5,6h9c0.83,0 1.5,0.67 1.5,1.5v9c0,0.83 -0.67,1.5 -1.5,1.5h-9C6.67,18 6,17.33 6,16.5v-9C6,6.67 6.67,6 7.5,6z"/></symbol>
+  <symbol id="i-eye" viewBox="0 0 24 24"><path d="M12,4.5C7,4.5 2.73,7.61 1,12c1.73,4.39 6,7.5 11,7.5s9.27,-3.11 11,-7.5c-1.73,-4.39 -6,-7.5 -11,-7.5zM12,17c-2.76,0 -5,-2.24 -5,-5s2.24,-5 5,-5 5,2.24 5,5 -2.24,5 -5,5zM12,9c-1.66,0 -3,1.34 -3,3s1.34,3 3,3 3,-1.34 3,-3 -1.34,-3 -3,-3z"/></symbol>
+  <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M17.65,6.35C16.2,4.9 14.21,4 12,4c-4.42,0 -7.99,3.58 -7.99,8s3.57,8 7.99,8c3.73,0 6.84,-2.55 7.73,-6h-2.08c-0.82,2.33 -3.04,4 -5.65,4 -3.31,0 -6,-2.69 -6,-6s2.69,-6 6,-6c1.66,0 3.14,0.69 4.22,1.78L13,11h7V4l-2.35,2.35z"/></symbol>
+</svg>
+
+<main class="app">
+  <header>
+    <h1>Mocha</h1>
+    <p>palabra al revés</p>
+    <button class="pill round-btn" id="newRound" aria-label="Nueva ronda"><svg><use href="#i-refresh"/></svg></button>
+  </header>
+
+  <button class="card coral" id="recOriginal" data-slot="recOriginal">
+    <svg class="icon" aria-hidden="true"><use href="#i-mic"/></svg>
+    <span class="label">Grabar palabra</span>
+    <span class="hint"></span>
+  </button>
+
+  <button class="card blue" id="playOriginal" data-slot="playOriginal">
+    <svg class="icon" aria-hidden="true"><use href="#i-back"/></svg>
+    <span class="label">Escuchar al revés</span>
+    <span class="hint"></span>
+  </button>
+
+  <p class="turn">La otra persona imita lo que escuchó</p>
+
+  <button class="card lime" id="recMimic" data-slot="recMimic">
+    <svg class="icon" aria-hidden="true"><use href="#i-mic"/></svg>
+    <span class="label">Grabar imitación</span>
+    <span class="hint"></span>
+  </button>
+
+  <button class="card blue" id="playMimic" data-slot="playMimic">
+    <svg class="icon" aria-hidden="true"><use href="#i-back"/></svg>
+    <span class="label">¿Qué palabra es?</span>
+    <span class="hint"></span>
+  </button>
+
+  <div class="bottom">
+    <button class="pill reveal" id="reveal" aria-label="Revelar: escuchar la palabra original al derecho">
+      <svg><use href="#i-eye"/></svg><span>Revelar</span>
+    </button>
+    <span class="spacer"></span>
+    <button class="pill score" data-player="0"><span aria-hidden="true">J1</span><b>0</b></button>
+    <button class="pill score" data-player="1"><span aria-hidden="true">J2</span><b>0</b></button>
+  </div>
+
+  <footer>Desarrollado por Ignacio Guacte</footer>
+</main>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<audio id="player" preload="auto" playsinline></audio>
+
+<script type="module">
+import { reversed, isPlayable, cleaned, withoutTapNoise, encodeWav, MAX_S } from "./pcm.js";
+
+const TEXT = {
+  hintRecOriginal: "Di una palabra, sin que el otro la vea",
+  hintPlayOriginalEmpty: "Primero graba una palabra",
+  hintPlayOriginalReady: "El otro escucha y memoriza",
+  hintRecMimic: "Imita lo que escuchaste, tal cual",
+  hintPlayMimicEmpty: "Primero graba la imitación",
+  hintPlayMimicReady: "Tu imitación dada vuelta. ¡Adivina!",
+  starting: "Abriendo micrófono…",
+  recording: (s) => `Grabando · ${s} s · toca para parar`,
+  playing: "Sonando · toca para parar",
+  processing: "Procesando…",
+  tooShort: "No se escuchó nada. Graba de nuevo, más cerca del micrófono",
+  micDenied: "Sin micrófono no hay juego. Permítelo en Ajustes › Safari › Micrófono",
+  micError: "No se pudo usar el micrófono. Cierra otras apps que lo usen y prueba de nuevo",
+  unsupported: "Este navegador no puede grabar. Abre la página en Safari",
+  playError: "No se pudo reproducir el audio. Prueba de nuevo",
+  roundCleared: "Ronda nueva: graba otra palabra",
+  scoreReset: "Marcador en cero",
+  scoreDesc: (who, n) => `Puntos de ${who}: ${n}. Toca para sumar, mantén para reiniciar el marcador`,
+};
+
+const $ = (id) => document.getElementById(id);
+const cards = {
+  recOriginal: $("recOriginal"), playOriginal: $("playOriginal"),
+  recMimic: $("recMimic"), playMimic: $("playMimic"),
+};
+const revealBtn = $("reveal");
+const player = $("player");
+const scoreBtns = [...document.querySelectorAll(".score")];
+
+// Grabaciones procesadas: { rev: url, fwd: url }
+const clips = { original: null, mimic: null };
+let busy = null;           // recOriginal | recMimic | playOriginal | playMimic | reveal | null
+let starting = false;      // esperando el permiso o que abra el micrófono
+let session = null;        // grabación en curso
+let ctx = null;            // AudioContext, solo para decodificar
+let scores = loadScores();
+let tick = null;
+
+// --- Grabación ---
+
+async function startRecording(slot) {
+  stopAll();
+  if (!navigator.mediaDevices?.getUserMedia || !window.MediaRecorder) return toast(TEXT.unsupported);
+  ctx ??= new (window.AudioContext || window.webkitAudioContext)();
+  starting = true; busy = slot; render();
+  let stream;
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+  } catch (e) {
+    starting = false; busy = null; render();
+    return toast(e?.name === "NotAllowedError" ? TEXT.micDenied : TEXT.micError, 5000);
+  }
+  if (busy !== slot) { stream.getTracks().forEach((t) => t.stop()); return; } // se canceló mientras tanto
+
+  let rec;
+  try { rec = new MediaRecorder(stream); } catch {
+    stream.getTracks().forEach((t) => t.stop());
+    starting = false; busy = null; render();
+    return toast(TEXT.micError);
+  }
+  const chunks = [];
+  const s = { rec, slot, stream, tapped: true, cancelled: false, startedAt: performance.now() };
+  rec.ondataavailable = (e) => { if (e.data.size) chunks.push(e.data); };
+  rec.onstop = () => {
+    stream.getTracks().forEach((t) => t.stop()); // suelta el micrófono: el audio vuelve al parlante
+    if (!s.cancelled) process(slot, new Blob(chunks, { type: rec.mimeType }), s.tapped);
+  };
+  s.timer = setTimeout(() => stopRecording(false), MAX_S * 1000);
+  session = s;
+  starting = false;
+  rec.start();
+  navigator.vibrate?.(15);
+  tick = setInterval(render, 250);
+  render();
+}
+
+function stopRecording(tapped = true) {
+  if (!session) return;
+  session.tapped = tapped;
+  clearTimeout(session.timer);
+  clearInterval(tick);
+  if (session.rec.state !== "inactive") session.rec.stop();
+  session = null;
+}
+
+function cancelRecording() {
+  if (session) session.cancelled = true;
+  stopRecording(true);
+}
+
+async function process(slot, blob, tapped) {
+  if (busy === slot) busy = null;
+  try {
+    const audio = await ctx.decodeAudioData(await blob.arrayBuffer());
+    const rate = audio.sampleRate;
+    const clip = cleaned(withoutTapNoise(audio.getChannelData(0), rate, tapped), rate);
+    if (!isPlayable(clip, rate)) {
+      toast(TEXT.tooShort);
+    } else {
+      const made = {
+        rev: URL.createObjectURL(new Blob([encodeWav(reversed(clip), rate)], { type: "audio/wav" })),
+        fwd: URL.createObjectURL(new Blob([encodeWav(clip, rate)], { type: "audio/wav" })),
+      };
+      if (slot === "recOriginal") {
+        setClip("original", made);
+        setClip("mimic", null); // palabra nueva: la imitación anterior ya no corresponde
+      } else {
+        setClip("mimic", made);
+      }
+    }
+  } catch {
+    toast(TEXT.micError);
+  }
+  render();
+}
+
+function setClip(key, value) {
+  const old = clips[key];
+  if (old) { URL.revokeObjectURL(old.rev); URL.revokeObjectURL(old.fwd); }
+  clips[key] = value;
+}
+
+// --- Reproducción ---
+
+function play(slot) {
+  if (busy === slot) { stopPlayback(); busy = null; return render(); }
+  const url = slot === "playOriginal" ? clips.original?.rev
+    : slot === "playMimic" ? clips.mimic?.rev
+    : clips.original?.fwd;
+  if (!url) return;
+  stopAll();
+  player.src = url;
+  busy = slot;
+  render();
+  player.play().catch(() => { if (busy === slot) busy = null; render(); toast(TEXT.playError); });
+}
+
+function stopPlayback() {
+  player.pause();
+  player.removeAttribute("src");
+  player.load();
+}
+
+player.addEventListener("ended", () => {
+  if (["playOriginal", "playMimic", "reveal"].includes(busy)) busy = null;
+  render();
+});
+
+function stopAll() {
+  cancelRecording();
+  if (busy && !busy.startsWith("rec")) stopPlayback();
+  busy = null;
+  starting = false;
+}
+
+// --- Marcador ---
+
+function loadScores() {
+  try { return JSON.parse(localStorage.getItem("mocha-scores")) ?? [0, 0]; } catch { return [0, 0]; }
+}
+function saveScores() {
+  try { localStorage.setItem("mocha-scores", JSON.stringify(scores)); } catch {}
+}
+
+scoreBtns.forEach((btn, i) => {
+  let holdTimer = null, held = false;
+  btn.addEventListener("pointerdown", () => {
+    held = false;
+    holdTimer = setTimeout(() => {
+      held = true;
+      scores = [0, 0]; saveScores(); render(); toast(TEXT.scoreReset);
+      navigator.vibrate?.(30);
+    }, 600);
+  });
+  const cancelHold = () => clearTimeout(holdTimer);
+  btn.addEventListener("pointerup", cancelHold);
+  btn.addEventListener("pointerleave", cancelHold);
+  btn.addEventListener("pointercancel", cancelHold);
+  btn.addEventListener("contextmenu", (e) => e.preventDefault());
+  btn.addEventListener("click", () => {
+    if (held) return;
+    scores[i]++; saveScores(); render();
+    const b = btn.querySelector("b");
+    b.classList.remove("bump"); void b.offsetWidth; b.classList.add("bump");
+  });
+});
+
+// --- Pantalla ---
+
+function setCard(card, { enabled = true, active = false, icon, hint }) {
+  card.disabled = !enabled;
+  card.classList.toggle("busy", active);
+  card.querySelector("use").setAttribute("href", active ? "#i-stop" : icon);
+  card.querySelector(".hint").textContent = hint;
+}
+
+function render() {
+  const secs = session ? Math.floor((performance.now() - session.startedAt) / 1000) : 0;
+  const recHint = (slot, idle) => busy !== slot ? idle
+    : starting ? TEXT.starting
+    : session ? TEXT.recording(secs)
+    : TEXT.processing;
+  const hasOriginal = !!clips.original, hasMimic = !!clips.mimic;
+
+  setCard(cards.recOriginal, { active: busy === "recOriginal", icon: "#i-mic", hint: recHint("recOriginal", TEXT.hintRecOriginal) });
+  setCard(cards.playOriginal, {
+    enabled: hasOriginal, active: busy === "playOriginal", icon: "#i-back",
+    hint: busy === "playOriginal" ? TEXT.playing : hasOriginal ? TEXT.hintPlayOriginalReady : TEXT.hintPlayOriginalEmpty,
+  });
+  setCard(cards.recMimic, { active: busy === "recMimic", icon: "#i-mic", hint: recHint("recMimic", TEXT.hintRecMimic) });
+  setCard(cards.playMimic, {
+    enabled: hasMimic, active: busy === "playMimic", icon: "#i-back",
+    hint: busy === "playMimic" ? TEXT.playing : hasMimic ? TEXT.hintPlayMimicReady : TEXT.hintPlayMimicEmpty,
+  });
+
+  revealBtn.disabled = !hasOriginal;
+  revealBtn.classList.toggle("busy", busy === "reveal");
+  revealBtn.querySelector("use").setAttribute("href", busy === "reveal" ? "#i-stop" : "#i-eye");
+
+  scoreBtns.forEach((btn, i) => {
+    btn.querySelector("b").textContent = scores[i];
+    btn.setAttribute("aria-label", TEXT.scoreDesc(i ? "J2" : "J1", scores[i]));
+  });
+}
+
+let toastTimer = null;
+function toast(text, ms = 3000) {
+  const el = $("toast");
+  el.textContent = text;
+  el.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove("show"), ms);
+}
+
+// --- Eventos ---
+
+for (const slot of ["recOriginal", "recMimic"]) {
+  cards[slot].addEventListener("click", () => {
+    if (busy === slot) {
+      if (!starting) stopRecording(true); // process() llega por onstop
+      return;
+    }
+    startRecording(slot);
+  });
+}
+cards.playOriginal.addEventListener("click", () => play("playOriginal"));
+cards.playMimic.addEventListener("click", () => play("playMimic"));
+revealBtn.addEventListener("click", () => play("reveal"));
+$("newRound").addEventListener("click", () => {
+  stopAll();
+  setClip("original", null);
+  setClip("mimic", null);
+  render();
+  toast(TEXT.roundCleared);
+});
+document.addEventListener("visibilitychange", () => { if (document.hidden) { stopAll(); render(); } });
+
+render();
+</script>
+</body>
+</html>
