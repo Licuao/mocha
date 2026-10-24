@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Fondo azul noche como la referencia, un poco más profundo para que las tarjetas resalten -->
+    <color name="night">#171C2E</color>
+    <color name="night_raised">#222842</color>
+    <color name="night_line">#343B5C</color>
+    <color name="paper">#F6F2EA</color>
+    <color name="paper_muted">#9AA1BE</color>
+
+    <color name="coral">#E8461A</color>
+    <color name="coral_ink">#FFF6F0</color>
+    <color name="periwinkle">#5674DA</color>
+    <color name="periwinkle_ink">#F4F6FF</color>
+    <color name="lime">#8FDC2C</color>
+    <color name="lime_ink">#15260A</color>
+</resources>

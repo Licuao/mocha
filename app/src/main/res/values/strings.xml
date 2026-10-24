@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Mocha</string>
+    <string name="tagline">palabra al revés</string>
+
+    <string name="record_original">Grabar palabra</string>
+    <string name="play_original_rev">Escuchar al revés</string>
+    <string name="record_mimic">Grabar imitación</string>
+    <string name="play_mimic_rev">¿Qué palabra es?</string>
+
+    <string name="hint_record_original">Di una palabra, sin que el otro la vea</string>
+    <string name="hint_play_original_rev">Primero graba una palabra</string>
+    <string name="hint_play_original_rev_ready">El otro escucha y memoriza</string>
+    <string name="hint_record_mimic">Imita lo que escuchaste, tal cual</string>
+    <string name="hint_play_mimic_rev">Primero graba la imitación</string>
+    <string name="hint_play_mimic_rev_ready">Tu imitación dada vuelta. ¡Adivina!</string>
+
+    <string name="recording">Grabando · %1$d s · toca para parar</string>
+    <string name="playing">Sonando · toca para parar</string>
+
+    <string name="between_pairs">La otra persona imita lo que escuchó</string>
+
+    <string name="reveal">Revelar</string>
+    <string name="reveal_desc">Escuchar la palabra original al derecho</string>
+    <string name="new_round">Nueva ronda</string>
+    <string name="player_one">J1</string>
+    <string name="player_two">J2</string>
+    <string name="score_desc">Puntos de %1$s: %2$d. Toca para sumar, mantén para reiniciar el marcador</string>
+
+    <string name="too_short">No se escuchó nada. Graba de nuevo, más cerca del micrófono</string>
+    <string name="mic_denied">Sin micrófono no hay juego. Actívalo en Ajustes &gt; Apps &gt; Mocha &gt; Permisos</string>
+    <string name="mic_error">No se pudo usar el micrófono. Cierra otras apps que lo usen y prueba de nuevo</string>
+    <string name="play_error">No se pudo reproducir el audio. Prueba de nuevo</string>
+    <string name="round_cleared">Ronda nueva: graba otra palabra</string>
+    <string name="score_reset">Marcador en cero</string>
+
+    <string name="credits">Desarrollado por Ignacio Guacte</string>
+</resources>

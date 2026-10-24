@@ -1,0 +1,300 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    android:orientation="vertical"
+    android:paddingStart="16dp"
+    android:paddingTop="4dp"
+    android:paddingEnd="16dp"
+    android:paddingBottom="8dp">
+
+    <!-- Encabezado: nombre + nueva ronda -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/rubik_black"
+            android:text="@string/app_name"
+            android:textColor="@color/paper"
+            android:textSize="26sp" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_weight="1"
+            android:fontFamily="@font/rubik_medium"
+            android:text="@string/tagline"
+            android:textColor="@color/paper_muted"
+            android:textSize="15sp" />
+
+        <ImageButton
+            android:id="@+id/btnNewRound"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="@drawable/pill"
+            android:contentDescription="@string/new_round"
+            android:padding="12dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_refresh"
+            android:tint="@color/paper" />
+    </LinearLayout>
+
+    <!-- 1. Grabar palabra -->
+    <cl.guacte.mocha.CardLayout
+        android:id="@+id/cardRecordOriginal"
+        android:soundEffectsEnabled="false"
+        style="@style/Mocha.Card"
+        android:layout_marginTop="6dp"
+        android:backgroundTint="@color/coral">
+
+        <ImageView
+            android:id="@+id/iconRecordOriginal"
+            style="@style/Mocha.CardIcon"
+            android:src="@drawable/ic_mic"
+            android:tint="@color/coral_ink" />
+
+        <TextView
+            style="@style/Mocha.CardLabel"
+            android:text="@string/record_original"
+            android:textColor="@color/coral_ink" />
+
+        <TextView
+            android:id="@+id/hintRecordOriginal"
+            style="@style/Mocha.CardHint"
+            android:text="@string/hint_record_original"
+            android:textColor="@color/coral_ink" />
+    </cl.guacte.mocha.CardLayout>
+
+    <!-- 2. Escuchar la palabra al revés -->
+    <cl.guacte.mocha.CardLayout
+        android:id="@+id/cardPlayOriginal"
+        style="@style/Mocha.Card"
+        android:layout_marginTop="10dp"
+        android:backgroundTint="@color/periwinkle">
+
+        <ImageView
+            android:id="@+id/iconPlayOriginal"
+            style="@style/Mocha.CardIcon"
+            android:src="@drawable/ic_play_back"
+            android:tint="@color/periwinkle_ink" />
+
+        <TextView
+            style="@style/Mocha.CardLabel"
+            android:text="@string/play_original_rev"
+            android:textColor="@color/periwinkle_ink" />
+
+        <TextView
+            android:id="@+id/hintPlayOriginal"
+            style="@style/Mocha.CardHint"
+            android:text="@string/hint_play_original_rev"
+            android:textColor="@color/periwinkle_ink" />
+    </cl.guacte.mocha.CardLayout>
+
+    <!-- Cambio de turno -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:layout_marginBottom="2dp"
+        android:fontFamily="@font/rubik_medium"
+        android:gravity="center"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:text="@string/between_pairs"
+        android:textColor="@color/paper_muted"
+        android:textSize="14sp" />
+
+    <!-- 3. Grabar imitación -->
+    <cl.guacte.mocha.CardLayout
+        android:id="@+id/cardRecordMimic"
+        android:soundEffectsEnabled="false"
+        style="@style/Mocha.Card"
+        android:layout_marginTop="10dp"
+        android:backgroundTint="@color/lime">
+
+        <ImageView
+            android:id="@+id/iconRecordMimic"
+            style="@style/Mocha.CardIcon"
+            android:src="@drawable/ic_mic"
+            android:tint="@color/lime_ink" />
+
+        <TextView
+            style="@style/Mocha.CardLabel"
+            android:text="@string/record_mimic"
+            android:textColor="@color/lime_ink" />
+
+        <TextView
+            android:id="@+id/hintRecordMimic"
+            style="@style/Mocha.CardHint"
+            android:text="@string/hint_record_mimic"
+            android:textColor="@color/lime_ink" />
+    </cl.guacte.mocha.CardLayout>
+
+    <!-- 4. La imitación dada vuelta: aquí se adivina -->
+    <cl.guacte.mocha.CardLayout
+        android:id="@+id/cardPlayMimic"
+        style="@style/Mocha.Card"
+        android:layout_marginTop="10dp"
+        android:backgroundTint="@color/periwinkle">
+
+        <ImageView
+            android:id="@+id/iconPlayMimic"
+            style="@style/Mocha.CardIcon"
+            android:src="@drawable/ic_play_back"
+            android:tint="@color/periwinkle_ink" />
+
+        <TextView
+            style="@style/Mocha.CardLabel"
+            android:text="@string/play_mimic_rev"
+            android:textColor="@color/periwinkle_ink" />
+
+        <TextView
+            android:id="@+id/hintPlayMimic"
+            style="@style/Mocha.CardHint"
+            android:text="@string/hint_play_mimic_rev"
+            android:textColor="@color/periwinkle_ink" />
+    </cl.guacte.mocha.CardLayout>
+
+    <!-- Revelar + marcador -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:id="@+id/btnReveal"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:background="@drawable/pill"
+            android:clickable="true"
+            android:contentDescription="@string/reveal_desc"
+            android:focusable="true"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingStart="14dp"
+            android:paddingEnd="16dp">
+
+            <ImageView
+                android:id="@+id/iconReveal"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:importantForAccessibility="no"
+                android:src="@drawable/ic_eye"
+                android:tint="@color/paper" />
+
+            <TextView
+                android:id="@+id/labelReveal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:fontFamily="@font/rubik_bold"
+                android:text="@string/reveal"
+                android:textColor="@color/paper"
+                android:textSize="15sp" />
+        </LinearLayout>
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <LinearLayout
+            android:id="@+id/scoreOne"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:background="@drawable/pill"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingStart="12dp"
+            android:paddingEnd="5dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/rubik_bold"
+                android:importantForAccessibility="no"
+                android:text="@string/player_one"
+                android:textColor="@color/paper"
+                android:textSize="15sp" />
+
+            <TextView
+                android:id="@+id/scoreOneValue"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:minWidth="36dp"
+                android:paddingStart="7dp"
+                android:paddingEnd="7dp"
+                android:layout_marginStart="8dp"
+                android:background="@drawable/score_badge"
+                android:fontFamily="@font/rubik_black"
+                android:fontFeatureSettings="tnum"
+                android:gravity="center"
+                android:importantForAccessibility="no"
+                android:textColor="@color/night"
+                android:textSize="16sp"
+                tools:text="0" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/scoreTwo"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:layout_marginStart="6dp"
+            android:background="@drawable/pill"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingStart="12dp"
+            android:paddingEnd="5dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/rubik_bold"
+                android:importantForAccessibility="no"
+                android:text="@string/player_two"
+                android:textColor="@color/paper"
+                android:textSize="15sp" />
+
+            <TextView
+                android:id="@+id/scoreTwoValue"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:minWidth="36dp"
+                android:paddingStart="7dp"
+                android:paddingEnd="7dp"
+                android:layout_marginStart="8dp"
+                android:background="@drawable/score_badge"
+                android:fontFamily="@font/rubik_black"
+                android:fontFeatureSettings="tnum"
+                android:gravity="center"
+                android:importantForAccessibility="no"
+                android:textColor="@color/night"
+                android:textSize="16sp"
+                tools:text="0" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:fontFamily="@font/rubik_medium"
+        android:gravity="center"
+        android:text="@string/credits"
+        android:textColor="@color/paper_muted"
+        android:textSize="12sp" />
+</LinearLayout>
